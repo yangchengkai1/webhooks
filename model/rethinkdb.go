@@ -1,1 +1,1 @@
-package rethinkdb
+package model
