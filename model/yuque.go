@@ -2,21 +2,21 @@ package model
 
 import r "github.com/dancannon/gorethink"
 
-// CreateYuqueTable -
-func CreateYuqueTable(session *r.Session) error {
-	_, err := r.DB("test").TableCreate("webhook").RunWrite(session)
+// CreateYuQueTable -
+func CreateYuQueTable(session *r.Session) error {
+	_, err := r.DB("test").TableCreate("YuQue").RunWrite(session)
 	return err
 }
 
-// InsertYuqueRecord -
-func InsertYuqueRecord(body string, actionType string, updateAt string, session *r.Session) error {
+// InsertYuQueRecord -
+func InsertYuQueRecord(body string, actionType string, updateAt string, session *r.Session) error {
 	var data = map[string]interface{}{
 		"ActionType": actionType,
 		"Body":       body,
 		"UpdateAt":   updateAt,
 	}
 
-	_, err := r.Table("webhook").Insert(data).RunWrite(session)
+	_, err := r.Table("YuQue").Insert(data).RunWrite(session)
 
 	return err
 }

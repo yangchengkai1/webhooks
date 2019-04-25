@@ -33,11 +33,11 @@ func main() {
 	}
 	s := &Session{session}
 
-	model.CreateGitTable(session)
-	model.CreateYuqueTable(session)
+	model.CreateGitTable(s.session)
+	model.CreateYuQueTable(s.session)
 
 	router.POST("/GitHub/webhook", s.handlerGitHub)
-	router.POST("/yuque/webhook", s.handlerYuque)
+	router.POST("/yuque/webhook", s.handlerYuQue)
 	router.Run(":8080")
 }
 
@@ -63,7 +63,7 @@ func (s Session) handlerGitHub(c *gin.Context) {
 	c.JSON(200, gin.H{"yuque": "1024"})
 }
 
-func (s Session) handlerYuque(c *gin.Context) {
+func (s Session) handlerYuQue(c *gin.Context) {
 	err := c.ShouldBind(&yqhook)
 	if err != nil {
 		c.Error(err)
@@ -71,7 +71,7 @@ func (s Session) handlerYuque(c *gin.Context) {
 		return
 	}
 
-	err = model.InsertYuqueRecord(yqhook.Data.Body, yqhook.Data.ActionType, yqhook.Data.UpdatedAt, s.session)
+	err = model.InsertYuQueRecord(yqhook.Data.Body, yqhook.Data.ActionType, yqhook.Data.UpdatedAt, s.session)
 	if err != nil {
 		c.Error(err)
 		return

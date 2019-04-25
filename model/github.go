@@ -7,7 +7,7 @@ import (
 
 // CreateGitTable -
 func CreateGitTable(session *r.Session) error {
-	_, err := r.DB("test").TableCreate("webhook").RunWrite(session)
+	_, err := r.DB("test").TableCreate("GitHub").RunWrite(session)
 	return err
 }
 
@@ -21,7 +21,7 @@ func InsertGitRecord(push github.PushPayload, session *r.Session) error {
 		"UpdatedAt":       push.Repository.UpdatedAt,
 	}
 
-	_, err := r.Table("webhook").Insert(data).RunWrite(session)
+	_, err := r.Table("GitHub").Insert(data).RunWrite(session)
 
 	return err
 }
