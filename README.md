@@ -1,2 +1,2 @@
 #
-Webhooks about GitHub and yuque
+Webhooks about GitHub and yuques
