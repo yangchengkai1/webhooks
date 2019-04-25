@@ -60,12 +60,6 @@ func (s Session) handlerGitHub(c *gin.Context) {
 		}
 	}
 
-	fmt.Println("-------------------------------  ")
-	fmt.Println("---header/---  ")
-	for k, v := range c.Request.Header {
-		fmt.Println(k, v)
-	}
-
 	c.JSON(200, gin.H{"yuque": "1024"})
 }
 
@@ -81,12 +75,6 @@ func (s Session) handlerYuque(c *gin.Context) {
 	if err != nil {
 		c.Error(err)
 		return
-	}
-
-	fmt.Println("-------------------------------  ")
-	fmt.Println("---header/---  ")
-	for k, v := range c.Request.Header {
-		fmt.Println(k, v)
 	}
 
 	c.JSON(200, gin.H{"yuque": "1024"})
