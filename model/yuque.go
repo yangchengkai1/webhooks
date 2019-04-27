@@ -1,10 +1,19 @@
 package model
 
-import r "github.com/dancannon/gorethink"
+import (
+	"errors"
+
+	r "github.com/dancannon/gorethink"
+)
+
+var (
+	errCreateTable = errors.New("rethinkdb: Table `test.GitHub` already exists. in:r.DB(`test`).TableCreate(`GitHub`)")
+)
 
 // CreateYuQueTable -
 func CreateYuQueTable(session *r.Session) error {
 	_, err := r.DB("test").TableCreate("YuQue").RunWrite(session)
+
 	return err
 }
 
