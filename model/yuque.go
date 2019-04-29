@@ -1,13 +1,10 @@
 package model
 
 import (
-	"errors"
 	"fmt"
 
 	r "github.com/dancannon/gorethink"
 )
-
-var errTableCreate = errors.New("table already exits")
 
 // CreateYuQueTable -
 func CreateYuQueTable() (*r.Session, error) {
@@ -16,18 +13,19 @@ func CreateYuQueTable() (*r.Session, error) {
 		Database: "yuque",
 	})
 	if err != nil {
-		fmt.Println("1111111")
 		fmt.Println(err)
 		return nil, err
 	}
 
-	err = CheckTable(yuqueSess, "yuque", "qq")
+	err = CheckTable(yuqueSess, "yuque", "YuQue")
+	if err == errTable {
+		return yuqueSess, nil
+	}
 	if err != nil {
-		fmt.Println("222222")
 		return nil, err
 	}
 
-	_, err = r.DB("yuque").TableCreate("qq").RunWrite(yuqueSess)
+	_, err = r.DB("yuque").TableCreate("YuQue").RunWrite(yuqueSess)
 
 	return yuqueSess, err
 }

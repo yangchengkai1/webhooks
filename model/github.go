@@ -17,7 +17,6 @@ func CheckTable(session *r.Session, dbname, tablename string) error {
 
 	cursor, err := r.DB(dbname).TableList().Run(session)
 	if err != nil {
-		fmt.Println("3333333")
 		return err
 	}
 	cursor.All(&list)
@@ -49,9 +48,13 @@ func CreateGitTable() (*r.Session, error) {
 	}
 
 	err = CheckTable(githubSess, "github", "GitHub")
+	if err == errTable {
+		return githubSess, nil
+	}
 	if err != nil {
 		return nil, err
 	}
+
 	_, err = r.DB("github").TableCreate("GitHub").RunWrite(githubSess)
 	return githubSess, err
 }

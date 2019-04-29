@@ -24,14 +24,14 @@ func main() {
 	router := gin.Default()
 
 	yuqueSess, err := model.CreateYuQueTable()
-	if err == nil {
+	if err != nil {
 		log.Fatal("failed")
 	}
 
 	yuque := &Session{yuqueSess}
 
 	githubSess, err := model.CreateGitTable()
-	if err == nil {
+	if err != nil {
 		log.Fatal("failed")
 	}
 
