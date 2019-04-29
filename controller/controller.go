@@ -23,25 +23,31 @@ type Session struct {
 func main() {
 	router := gin.Default()
 
-	session, err := r.Connect(r.ConnectOpts{
+	yqSession, err := r.Connect(r.ConnectOpts{
 		Address:  "localhost",
-		Database: "test",
+		Database: "yuque",
 	})
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
-	s := &Session{session}
+	yuque := &Session{yqSession}
 
-	model.CreateGitTable(s.session)
-	model.CreateYuQueTable(s.session)
+	gitSession, err := r.Connect(r.ConnectOpts{
+		Address:  "localhost",
+		Database: "github",
+	})
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	git := &Session{gitSession}
 
-	router.POST("/GitHub/webhook", s.githubHandler)
-	router.POST("/yuque/webhook", s.yuqueHandler)
+	model.CreateGitTable(yuque.session)
+	model.CreateYuQueTable(git.session)
 
-	router.POST("/update", s.updateByID)
-	router.POST("/select", s.selectByID)
-	router.POST("/delate", s.delateByID)
+	router.POST("/GitHub/webhook", git.githubHandler)
+	router.POST("/yuque/webhook", yuque.yuqueHandler)
 
 	router.Run(":8080")
 }
@@ -63,72 +69,6 @@ func (s Session) githubHandler(c *gin.Context) {
 			c.Error(err)
 			return
 		}
-	}
-
-	c.JSON(http.StatusOK, gin.H{"GitHub": "1024"})
-}
-
-func (s Session) selectByID(c *gin.Context) {
-	var github struct {
-		ID        string `json:"id"`
-		TableName string `json:"tablename"`
-	}
-
-	err := c.ShouldBind(&github)
-	if err != nil {
-		c.Error(err)
-		return
-	}
-
-	err = model.SelectRecord(s.session, github.ID, github.TableName)
-	if err != nil {
-		c.Error(err)
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{github.TableName: "1024"})
-}
-
-func (s Session) delateByID(c *gin.Context) {
-	var github struct {
-		ID        string `json:"id"`
-		TableName string `json:"tablename"`
-	}
-
-	err := c.ShouldBind(&github)
-	if err != nil {
-		c.Error(err)
-		return
-	}
-
-	result, err := model.DelateRecord(s.session, github.ID, github.TableName)
-	if err != nil {
-		c.Error(err)
-		return
-	}
-
-	fmt.Println(result)
-	c.JSON(http.StatusOK, gin.H{github.TableName: "1024"})
-}
-
-func (s Session) updateByID(c *gin.Context) {
-	var github struct {
-		ID        string `json:"id"`
-		Title     string `json:"title"`
-		Update    string `json:"update"`
-		TableName string `json:"tablename"`
-	}
-
-	err := c.ShouldBind(&github)
-	if err != nil {
-		c.Error(err)
-		return
-	}
-
-	err = model.UpdateRecord(s.session, github.ID, github.TableName, github.Title, github.Update)
-	if err != nil {
-		c.Error(err)
-		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"GitHub": "1024"})

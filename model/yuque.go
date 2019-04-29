@@ -12,7 +12,7 @@ var (
 
 // CreateYuQueTable -
 func CreateYuQueTable(session *r.Session) error {
-	_, err := r.DB("test").TableCreate("YuQue").RunWrite(session)
+	_, err := r.DB("yuque").TableCreate("YuQue").RunWrite(session)
 
 	return err
 }
