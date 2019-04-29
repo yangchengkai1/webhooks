@@ -2,27 +2,43 @@ package model
 
 import (
 	"errors"
+	"fmt"
 
 	r "github.com/dancannon/gorethink"
 )
 
-var (
-	errCreateTable = errors.New("rethinkdb: Table `test.GitHub` already exists. in:r.DB(`test`).TableCreate(`GitHub`)")
-)
+var errTableCreate = errors.New("table already exits")
 
 // CreateYuQueTable -
-func CreateYuQueTable(session *r.Session) error {
-	_, err := r.DB("yuque").TableCreate("YuQue").RunWrite(session)
+func CreateYuQueTable() (*r.Session, error) {
+	yuqueSess, err := r.Connect(r.ConnectOpts{
+		Address:  "localhost",
+		Database: "yuque",
+	})
+	if err != nil {
+		fmt.Println("1111111")
+		fmt.Println(err)
+		return nil, err
+	}
 
-	return err
+	err = CheckTable(yuqueSess, "yuque", "qq")
+	if err != nil {
+		fmt.Println("222222")
+		return nil, err
+	}
+
+	_, err = r.DB("yuque").TableCreate("qq").RunWrite(yuqueSess)
+
+	return yuqueSess, err
 }
 
 // InsertYuQueRecord -
-func InsertYuQueRecord(body string, actionType string, updateAt string, session *r.Session) error {
+func InsertYuQueRecord(body string, actionType string, updateAt string, user string, session *r.Session) error {
 	var data = map[string]interface{}{
 		"ActionType": actionType,
 		"Body":       body,
 		"UpdateAt":   updateAt,
+		"User":       user,
 	}
 
 	_, err := r.Table("YuQue").Insert(data).RunWrite(session)

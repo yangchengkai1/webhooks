@@ -1,7 +1,7 @@
 package main
 
 import (
-	"fmt"
+	"log"
 	"mytest/webhook/yuque"
 	"net/http"
 
@@ -23,31 +23,24 @@ type Session struct {
 func main() {
 	router := gin.Default()
 
-	yqSession, err := r.Connect(r.ConnectOpts{
-		Address:  "localhost",
-		Database: "yuque",
-	})
-	if err != nil {
-		fmt.Println(err)
-		return
+	yuqueSess, err := model.CreateYuQueTable()
+	if err == nil {
+		log.Fatal("failed")
 	}
-	yuque := &Session{yqSession}
 
-	gitSession, err := r.Connect(r.ConnectOpts{
-		Address:  "localhost",
-		Database: "github",
-	})
-	if err != nil {
-		fmt.Println(err)
-		return
+	yuque := &Session{yuqueSess}
+
+	githubSess, err := model.CreateGitTable()
+	if err == nil {
+		log.Fatal("failed")
 	}
-	git := &Session{gitSession}
 
-	model.CreateGitTable(yuque.session)
-	model.CreateYuQueTable(git.session)
+	git := &Session{githubSess}
 
 	router.POST("/GitHub/webhook", git.githubHandler)
 	router.POST("/yuque/webhook", yuque.yuqueHandler)
+	router.POST("/GitHub/select", git.selectHandler)
+	router.POST("yuque/select", yuque.selectHandler)
 
 	router.Run(":8080")
 }
@@ -82,11 +75,41 @@ func (s Session) yuqueHandler(c *gin.Context) {
 		return
 	}
 
-	err = model.InsertYuQueRecord(yqhook.Data.Body, yqhook.Data.ActionType, yqhook.Data.UpdatedAt, s.session)
+	err = model.InsertYuQueRecord(yqhook.Data.Body, yqhook.Data.ActionType, yqhook.Data.UpdatedAt, yqhook.Data.User.Name, s.session)
 	if err != nil {
 		c.Error(err)
 		return
 	}
 
 	c.JSON(http.StatusOK, gin.H{"yuque": "1024"})
+}
+
+func (s Session) selectHandler(c *gin.Context) {
+	var github struct {
+		DBName    string `json:"dbname"`
+		TableName string `json:"tablename"`
+		Field     string `json:"field"`
+		Value     string `json:"value"`
+		Update    string `json:"update"`
+	}
+
+	err := c.ShouldBind(&github)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+	/*
+		up, err := model.UpdateRecord(s.session, github.DBName, github.TableName, github.Field, github.Update)
+		if err != nil {
+			c.Error(err)
+			return
+		}*/
+
+	all, err := model.SelectRecord(s.session, github.DBName, github.TableName, github.Field, github.Value)
+	if err != nil {
+		c.Error(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"all": all})
 }

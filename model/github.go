@@ -1,16 +1,59 @@
 package model
 
 import (
+	"errors"
 	"fmt"
 
 	r "github.com/dancannon/gorethink"
 	"gopkg.in/go-playground/webhooks.v5/github"
 )
 
+var errTable = errors.New("table already exits")
+
+//CheckTable -
+func CheckTable(session *r.Session, dbname, tablename string) error {
+	var list []interface{}
+	var check bool
+
+	cursor, err := r.DB(dbname).TableList().Run(session)
+	if err != nil {
+		fmt.Println("3333333")
+		return err
+	}
+	cursor.All(&list)
+	cursor.Close()
+
+	for _, table := range list {
+		if !check {
+			tn := table.(string)
+			if tn == tablename {
+				return errTable
+			}
+		}
+
+	}
+
+	return nil
+
+}
+
 // CreateGitTable -
-func CreateGitTable(session *r.Session) error {
-	_, err := r.DB("github").TableCreate("GitHub").RunWrite(session)
-	return err
+func CreateGitTable() (*r.Session, error) {
+	githubSess, err := r.Connect(r.ConnectOpts{
+		Address:  "localhost",
+		Database: "github",
+	})
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	err = CheckTable(githubSess, "github", "GitHub")
+	if err != nil {
+		return nil, err
+	}
+	_, err = r.DB("github").TableCreate("GitHub").RunWrite(githubSess)
+	return githubSess, err
 }
 
 // InsertGitRecord -
@@ -29,11 +72,33 @@ func InsertGitRecord(push github.PushPayload, session *r.Session) error {
 }
 
 // SelectRecord -
-func SelectRecord(session *r.Session, id, tablename string) error {
-	ew := r.DB("test").Table(tablename).Get(id).Values()
-	fmt.Println(ew, "2")
+func SelectRecord(session *r.Session, dbname, tablename, field, value string) (interface{}, error) {
+	var all []interface{}
 
-	res, err := r.DB("test").Table(tablename).Get(id).Run(session)
-	fmt.Println(res, "2")
-	return err
+	acursor, err := r.DB(dbname).Table(tablename).Filter(r.Row.Field(field).Eq(value)).Run(session)
+
+	acursor.All(&all)
+	acursor.Close()
+
+	return all, err
+}
+
+// DelateRecord -
+func DelateRecord(session *r.Session, dbname, tablename, field, value string) (interface{}, error) {
+
+	acursor, err := r.DB(dbname).Table(tablename).Filter(r.Row.Field(field).Eq(value)).Delete().Run(session)
+
+	return acursor, err
+}
+
+// UpdateRecord -
+func UpdateRecord(session *r.Session, tablename, field, value string) (interface{}, error) {
+	var all []interface{}
+
+	acursor, err := r.Table(tablename).Update(r.Row.Field(field).Eq(value)).Run(session)
+
+	acursor.All(&all)
+	acursor.Close()
+
+	return all, err
 }
