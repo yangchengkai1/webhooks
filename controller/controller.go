@@ -80,13 +80,18 @@ func (s Session) yuqueHandler(c *gin.Context) {
 		c.Error(err)
 		return
 	}
+	err = model.DelateRecord(s.session, "yuque", "YuQue", "ActionType", "update")
+	if err != nil {
+		c.Error(err)
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"yuque": "1024"})
 }
 
 func (s Session) selectHandler(c *gin.Context) {
 	var github struct {
-		DBName    string `json:"dbname"`
+		//	DBName    string `json:"dbname"`
 		TableName string `json:"tablename"`
 		Field     string `json:"field"`
 		Value     string `json:"value"`
@@ -98,14 +103,8 @@ func (s Session) selectHandler(c *gin.Context) {
 		c.Error(err)
 		return
 	}
-	/*
-		up, err := model.UpdateRecord(s.session, github.DBName, github.TableName, github.Field, github.Update)
-		if err != nil {
-			c.Error(err)
-			return
-		}*/
 
-	all, err := model.SelectRecord(s.session, github.DBName, github.TableName, github.Field, github.Value)
+	all, err := model.SelectRecord(s.session, github.TableName, github.Field, github.Value)
 	if err != nil {
 		c.Error(err)
 		return

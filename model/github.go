@@ -75,10 +75,10 @@ func InsertGitRecord(push github.PushPayload, session *r.Session) error {
 }
 
 // SelectRecord -
-func SelectRecord(session *r.Session, dbname, tablename, field, value string) (interface{}, error) {
+func SelectRecord(session *r.Session, tablename, field, value string) (interface{}, error) {
 	var all []interface{}
 
-	acursor, err := r.DB(dbname).Table(tablename).Filter(r.Row.Field(field).Eq(value)).Run(session)
+	acursor, err := r.Table(tablename).Filter(r.Row.Field(field).Eq(value)).Run(session)
 
 	acursor.All(&all)
 	acursor.Close()
@@ -87,21 +87,22 @@ func SelectRecord(session *r.Session, dbname, tablename, field, value string) (i
 }
 
 // DelateRecord -
-func DelateRecord(session *r.Session, dbname, tablename, field, value string) (interface{}, error) {
+func DelateRecord(session *r.Session, dbname, tablename, field, value string) error {
+	var delate = map[string]interface{}{
+		field: value,
+	}
+	_, err := r.DB(dbname).Table(tablename).Filter(delate).Delete().Run(session)
 
-	acursor, err := r.DB(dbname).Table(tablename).Filter(r.Row.Field(field).Eq(value)).Delete().Run(session)
-
-	return acursor, err
+	return err
 }
 
 // UpdateRecord -
-func UpdateRecord(session *r.Session, tablename, field, value string) (interface{}, error) {
-	var all []interface{}
+func UpdateRecord(session *r.Session, tablename, field, value string) error {
+	var update = map[string]interface{}{
+		field: value,
+	}
 
-	acursor, err := r.Table(tablename).Update(r.Row.Field(field).Eq(value)).Run(session)
+	_, err := r.Table(tablename).Update(update).Run(session)
 
-	acursor.All(&all)
-	acursor.Close()
-
-	return all, err
+	return err
 }
