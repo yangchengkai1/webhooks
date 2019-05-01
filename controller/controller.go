@@ -51,6 +51,7 @@ func (s Session) githubHandler(c *gin.Context) {
 	payload, err := hook.Parse(c.Request, github.PushEvent, github.PullRequestEvent)
 	if err != nil {
 		c.Error(err)
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest})
 		return
 	}
 
@@ -60,6 +61,7 @@ func (s Session) githubHandler(c *gin.Context) {
 		err = model.InsertGitRecord(push, s.session)
 		if err != nil {
 			c.Error(err)
+			c.JSON(http.StatusMethodNotAllowed, gin.H{"status": http.StatusMethodNotAllowed})
 			return
 		}
 	}
@@ -78,11 +80,7 @@ func (s Session) yuqueHandler(c *gin.Context) {
 	err = model.InsertYuQueRecord(yqhook.Data.Body, yqhook.Data.ActionType, yqhook.Data.UpdatedAt, yqhook.Data.User.Name, s.session)
 	if err != nil {
 		c.Error(err)
-		return
-	}
-	err = model.DelateRecord(s.session, "yuque", "YuQue", "ActionType", "update")
-	if err != nil {
-		c.Error(err)
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"status": http.StatusMethodNotAllowed})
 		return
 	}
 
@@ -101,12 +99,14 @@ func (s Session) selectHandler(c *gin.Context) {
 	err := c.ShouldBind(&github)
 	if err != nil {
 		c.Error(err)
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest})
 		return
 	}
 
 	all, err := model.SelectRecord(s.session, github.TableName, github.Field, github.Value)
 	if err != nil {
 		c.Error(err)
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"status": http.StatusMethodNotAllowed})
 		return
 	}
 
