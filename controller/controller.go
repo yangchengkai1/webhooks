@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"mytest/webhook/yuque"
 	"net/http"
 
@@ -23,24 +22,25 @@ type Session struct {
 func main() {
 	router := gin.Default()
 
-	yuqueSess, err := model.CreateYuQueTable()
-	if err != nil {
-		log.Fatal("failed")
-	}
+	/*	yuqueSess, err := model.CreateYuQueTable()
+		if err != nil {
+			log.Fatal("failed")
+		}
 
-	yuque := &Session{yuqueSess}
+		yuque := &Session{yuqueSess}
 
-	githubSess, err := model.CreateGitTable()
-	if err != nil {
-		log.Fatal("failed")
-	}
+		githubSess, err := model.CreateGitTable()
+		if err != nil {
+			log.Fatal("failed")
+		}
 
-	git := &Session{githubSess}
+		git := &Session{githubSess}
 
-	router.POST("/GitHub/webhook", git.githubHandler)
-	router.POST("/yuque/webhook", yuque.yuqueHandler)
-	router.POST("/GitHub/select", git.selectHandler)
-	router.POST("yuque/select", yuque.selectHandler)
+		/*	router.POST("/GitHub/webhook", git.githubHandler)
+			router.POST("/yuque/webhook", yuque.yuqueHandler)
+			router.POST("/GitHub/select", git.selectHandler)
+			router.POST("yuque/select", yuque.selectHandler)
+	*/
 
 	router.Run(":8080")
 }
