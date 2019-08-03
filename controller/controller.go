@@ -26,21 +26,21 @@ func main() {
 
 	yuqueSess, err := model.CreateYuQueTable()
 	if err != nil {
-		log.Fatal("failed")
+		log.Fatal(err)
 	}
 
 	yuque := &Session{yuqueSess}
 
 	githubSess, err := model.CreateGitTable()
 	if err != nil {
-		log.Fatal("failed")
+		log.Fatal(err)
 	}
 
 	git := &Session{githubSess}
 
-	router.POST("/GitHub/webhook", git.githubHandler)
+	router.POST("/github/webhook", git.githubHandler)
 	router.POST("/yuque/webhook", yuque.yuqueHandler)
-	router.POST("/GitHub/select", git.selectHandler)
+	router.POST("/github/select", git.selectHandler)
 	router.POST("yuque/select", yuque.selectHandler)
 
 	router.Run(":8080")
@@ -77,7 +77,7 @@ func (s Session) yuqueHandler(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest})
 		return
 	}
-
+	log.Println(yqhook)
 	err = model.InsertYuQueRecord(yqhook.Data.Body, yqhook.Data.ActionType, yqhook.Data.UpdatedAt, yqhook.Data.User.Name, s.session)
 	if err != nil {
 		c.Error(err)

@@ -18,7 +18,7 @@ func CreateGitTable() (*r.Session, error) {
 		return nil, err
 	}
 
-	err = CheckTable(githubSess, "github", "GitHub")
+	err = CheckTable(githubSess, "github", "github")
 	if err == errTable {
 		return githubSess, nil
 	}
@@ -26,7 +26,7 @@ func CreateGitTable() (*r.Session, error) {
 		return nil, err
 	}
 
-	_, err = r.DB("github").TableCreate("GitHub").RunWrite(githubSess)
+	_, err = r.DB("github").TableCreate("github").RunWrite(githubSess)
 	return githubSess, err
 }
 
@@ -40,7 +40,7 @@ func InsertGitRecord(push github.PushPayload, session *r.Session) error {
 		"UpdatedAt":       push.Repository.UpdatedAt,
 	}
 
-	_, err := r.Table("GitHub").Insert(data).RunWrite(session)
+	_, err := r.Table("github").Insert(data).RunWrite(session)
 
 	return err
 }

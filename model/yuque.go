@@ -17,7 +17,7 @@ func CreateYuQueTable() (*r.Session, error) {
 		return nil, err
 	}
 
-	err = CheckTable(yuqueSess, "yuque", "YuQue")
+	err = CheckTable(yuqueSess, "yuque", "yuque")
 	if err == errTable {
 		return yuqueSess, nil
 	}
@@ -25,7 +25,7 @@ func CreateYuQueTable() (*r.Session, error) {
 		return nil, err
 	}
 
-	_, err = r.DB("yuque").TableCreate("YuQue").RunWrite(yuqueSess)
+	_, err = r.DB("yuque").TableCreate("yuque").RunWrite(yuqueSess)
 
 	return yuqueSess, err
 }
@@ -39,7 +39,7 @@ func InsertYuQueRecord(body string, actionType string, updateAt string, user str
 		"User":       user,
 	}
 
-	_, err := r.Table("YuQue").Insert(data).RunWrite(session)
+	_, err := r.Table("yuque").Insert(data).RunWrite(session)
 
 	return err
 }
