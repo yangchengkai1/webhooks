@@ -37,6 +37,7 @@ func RegisterRouter(router gin.IRouter) {
 	}
 
 	ss = &Session{ys: ys, gs: gs}
+
 	router.POST("/github/webhook", ss.githubStore)
 	router.POST("/yuque/webhook", ss.yuqueStore)
 	router.POST("/select", ss.selectHandler)

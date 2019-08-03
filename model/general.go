@@ -2,7 +2,6 @@ package model
 
 import (
 	"errors"
-	"fmt"
 
 	r "github.com/dancannon/gorethink"
 )
@@ -16,7 +15,6 @@ func CreateTable(DBName, TableName string) (*r.Session, error) {
 		Database: DBName,
 	})
 	if err != nil {
-		fmt.Println(err)
 		return nil, err
 	}
 
@@ -42,6 +40,7 @@ func CheckTable(session *r.Session, dbname, tablename string) error {
 	if err != nil {
 		return err
 	}
+
 	cursor.All(&list)
 	cursor.Close()
 
