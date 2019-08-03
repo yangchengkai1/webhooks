@@ -31,19 +31,15 @@ func main() {
 		log.Fatal(err)
 	}
 
-	ss = &Session{ys: ys}
-
 	gs, err := model.CreateTable("github", "github")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	ss = &Session{gs: gs}
-	log.Println(ss)
+	ss = &Session{ys: ys, gs: gs}
 	router.POST("/github/webhook", ss.githubStore)
 	router.POST("/yuque/webhook", ss.yuqueStore)
-	router.POST("/github/select", ss.selectHandler)
-	router.POST("/yuque/select", ss.selectHandler)
+	router.POST("/select", ss.selectHandler)
 
 	router.Run(":8080")
 }
