@@ -6,28 +6,28 @@ import (
 	r "github.com/dancannon/gorethink"
 )
 
-// CreateYuQueTable -
-func CreateYuQueTable() (*r.Session, error) {
-	yuqueSess, err := r.Connect(r.ConnectOpts{
+// CreateTable -
+func CreateTable(DBName, TableName string) (*r.Session, error) {
+	Session, err := r.Connect(r.ConnectOpts{
 		Address:  "localhost",
-		Database: "yuque",
+		Database: DBName,
 	})
 	if err != nil {
 		fmt.Println(err)
 		return nil, err
 	}
 
-	err = CheckTable(yuqueSess, "yuque", "yuque")
+	err = CheckTable(Session, DBName, TableName)
 	if err == errTable {
-		return yuqueSess, nil
+		return Session, nil
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = r.DB("yuque").TableCreate("yuque").RunWrite(yuqueSess)
+	_, err = r.DB(DBName).TableCreate(TableName).RunWrite(Session)
 
-	return yuqueSess, err
+	return Session, err
 }
 
 // InsertYuQueRecord -

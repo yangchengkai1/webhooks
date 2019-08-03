@@ -18,35 +18,37 @@ var yqhook struct {
 
 // Session -
 type Session struct {
-	session *r.Session
+	ys *r.Session
+	gs *r.Session
 }
 
 func main() {
+	var ss *Session
 	router := gin.Default()
 
-	yuqueSess, err := model.CreateYuQueTable()
+	ys, err := model.CreateTable("yuque", "yuque")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	yuque := &Session{yuqueSess}
+	ss = &Session{ys: ys}
 
-	githubSess, err := model.CreateGitTable()
+	gs, err := model.CreateTable("github", "github")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	git := &Session{githubSess}
-
-	router.POST("/github/webhook", git.githubHandler)
-	router.POST("/yuque/webhook", yuque.yuqueHandler)
-	router.POST("/github/select", git.selectHandler)
-	router.POST("yuque/select", yuque.selectHandler)
+	ss = &Session{gs: gs}
+	log.Println(ss)
+	router.POST("/github/webhook", ss.githubStore)
+	router.POST("/yuque/webhook", ss.yuqueStore)
+	router.POST("/github/select", ss.selectHandler)
+	router.POST("/yuque/select", ss.selectHandler)
 
 	router.Run(":8080")
 }
 
-func (s Session) githubHandler(c *gin.Context) {
+func (s Session) githubStore(c *gin.Context) {
 	hook, _ := github.New(github.Options.Secret("MyGitHubSuperSecret"))
 
 	payload, err := hook.Parse(c.Request, github.PushEvent, github.PullRequestEvent)
@@ -59,7 +61,7 @@ func (s Session) githubHandler(c *gin.Context) {
 	switch payload.(type) {
 	case github.PushPayload:
 		push := payload.(github.PushPayload)
-		err = model.InsertGitRecord(push, s.session)
+		err = model.InsertGitRecord(push, s.gs)
 		if err != nil {
 			c.Error(err)
 			c.JSON(http.StatusMethodNotAllowed, gin.H{"status": http.StatusMethodNotAllowed})
@@ -67,44 +69,55 @@ func (s Session) githubHandler(c *gin.Context) {
 		}
 	}
 
-	c.JSON(http.StatusOK, gin.H{"GitHub": "1024"})
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK})
 }
 
-func (s Session) yuqueHandler(c *gin.Context) {
+func (s Session) yuqueStore(c *gin.Context) {
 	err := c.ShouldBind(&yqhook)
 	if err != nil {
 		c.Error(err)
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest})
 		return
 	}
-	log.Println(yqhook)
-	err = model.InsertYuQueRecord(yqhook.Data.Body, yqhook.Data.ActionType, yqhook.Data.UpdatedAt, yqhook.Data.User.Name, s.session)
+
+	err = model.InsertYuQueRecord(yqhook.Data.Body, yqhook.Data.ActionType, yqhook.Data.UpdatedAt, yqhook.Data.User.Name, s.ys)
 	if err != nil {
 		c.Error(err)
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"status": http.StatusMethodNotAllowed})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"yuque": "1024"})
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK})
 }
 
 func (s Session) selectHandler(c *gin.Context) {
-	var github struct {
-		//	DBName    string `json:"dbname"`
-		TableName string `json:"tablename"`
-		Field     string `json:"field"`
-		Value     string `json:"value"`
-		Update    string `json:"update"`
-	}
+	var (
+		term struct {
+			//	DBName    string `json:"dbname"`
+			TableName string `json:"tablename"`
+			Field     string `json:"field"`
+			Value     string `json:"value"`
+			Update    string `json:"update"`
+		}
 
-	err := c.ShouldBind(&github)
+		session *r.Session
+	)
+
+	err := c.ShouldBind(&term)
 	if err != nil {
 		c.Error(err)
 		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest})
 		return
 	}
 
-	all, err := model.SelectRecord(s.session, github.TableName, github.Field, github.Value)
+	switch term.TableName {
+	case "yuque":
+		session = s.ys
+	case "github":
+		session = s.gs
+	}
+
+	all, err := model.SelectRecord(session, term.TableName, term.Field, term.Value)
 	if err != nil {
 		c.Error(err)
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"status": http.StatusMethodNotAllowed})

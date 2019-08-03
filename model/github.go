@@ -1,12 +1,11 @@
 package model
 
 import (
-	"fmt"
-
 	r "github.com/dancannon/gorethink"
 	"gopkg.in/go-playground/webhooks.v5/github"
 )
 
+/*
 // CreateGitTable -
 func CreateGitTable() (*r.Session, error) {
 	githubSess, err := r.Connect(r.ConnectOpts{
@@ -28,7 +27,7 @@ func CreateGitTable() (*r.Session, error) {
 
 	_, err = r.DB("github").TableCreate("github").RunWrite(githubSess)
 	return githubSess, err
-}
+}*/
 
 // InsertGitRecord -
 func InsertGitRecord(push github.PushPayload, session *r.Session) error {
