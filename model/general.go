@@ -2,11 +2,36 @@ package model
 
 import (
 	"errors"
+	"fmt"
 
 	r "github.com/dancannon/gorethink"
 )
 
 var errTable = errors.New("table already exits")
+
+// CreateTable -
+func CreateTable(DBName, TableName string) (*r.Session, error) {
+	Session, err := r.Connect(r.ConnectOpts{
+		Address:  "localhost",
+		Database: DBName,
+	})
+	if err != nil {
+		fmt.Println(err)
+		return nil, err
+	}
+
+	err = CheckTable(Session, DBName, TableName)
+	if err == errTable {
+		return Session, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = r.DB(DBName).TableCreate(TableName).RunWrite(Session)
+
+	return Session, err
+}
 
 //CheckTable -
 func CheckTable(session *r.Session, dbname, tablename string) error {
@@ -27,7 +52,6 @@ func CheckTable(session *r.Session, dbname, tablename string) error {
 				return errTable
 			}
 		}
-
 	}
 
 	return nil

@@ -1,4 +1,4 @@
-package main
+package controller
 
 import (
 	"log"
@@ -22,9 +22,9 @@ type Session struct {
 	gs *r.Session
 }
 
-func main() {
+// RegisterRouter -
+func RegisterRouter(router gin.IRouter) {
 	var ss *Session
-	router := gin.Default()
 
 	ys, err := model.CreateTable("yuque", "yuque")
 	if err != nil {
@@ -40,8 +40,6 @@ func main() {
 	router.POST("/github/webhook", ss.githubStore)
 	router.POST("/yuque/webhook", ss.yuqueStore)
 	router.POST("/select", ss.selectHandler)
-
-	router.Run(":8080")
 }
 
 func (s Session) githubStore(c *gin.Context) {
@@ -89,11 +87,9 @@ func (s Session) yuqueStore(c *gin.Context) {
 func (s Session) selectHandler(c *gin.Context) {
 	var (
 		term struct {
-			//	DBName    string `json:"dbname"`
 			TableName string `json:"tablename"`
 			Field     string `json:"field"`
 			Value     string `json:"value"`
-			Update    string `json:"update"`
 		}
 
 		session *r.Session

@@ -1,34 +1,8 @@
 package model
 
 import (
-	"fmt"
-
 	r "github.com/dancannon/gorethink"
 )
-
-// CreateTable -
-func CreateTable(DBName, TableName string) (*r.Session, error) {
-	Session, err := r.Connect(r.ConnectOpts{
-		Address:  "localhost",
-		Database: DBName,
-	})
-	if err != nil {
-		fmt.Println(err)
-		return nil, err
-	}
-
-	err = CheckTable(Session, DBName, TableName)
-	if err == errTable {
-		return Session, nil
-	}
-	if err != nil {
-		return nil, err
-	}
-
-	_, err = r.DB(DBName).TableCreate(TableName).RunWrite(Session)
-
-	return Session, err
-}
 
 // InsertYuQueRecord -
 func InsertYuQueRecord(body string, actionType string, updateAt string, user string, session *r.Session) error {
