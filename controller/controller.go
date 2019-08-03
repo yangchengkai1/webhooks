@@ -2,14 +2,14 @@ package controller
 
 import (
 	"log"
-
 	"net/http"
+
+	"gopkg.in/go-playground/webhooks.v5/github"
 
 	r "github.com/dancannon/gorethink"
 	"github.com/gin-gonic/gin"
 	"github.com/yangchengkai1/webhooks/model"
 	yuque "github.com/yangchengkai1/webhooks/model"
-	"gopkg.in/go-playground/webhooks.v5/github"
 )
 
 var yqhook struct {

@@ -9,5 +9,6 @@ func main() {
 	router := gin.Default()
 
 	c.RegisterRouter(router)
+
 	router.Run(":8080")
 }
