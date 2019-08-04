@@ -88,9 +88,9 @@ func (s Session) yuqueStore(c *gin.Context) {
 func (s Session) selectHandler(c *gin.Context) {
 	var (
 		term struct {
-			TableName string `json:"tablename"`
-			Field     string `json:"field"`
-			Value     string `json:"value"`
+			TableName string `json:"table_name" binding:"required"`
+			Field     string `json:"field"      binding:"required"`
+			Value     string `json:"value"      binding:"required"`
 		}
 
 		session *r.Session
