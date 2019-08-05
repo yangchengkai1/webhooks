@@ -13,7 +13,7 @@ func InsertYuQueRecord(body string, actionType string, updateAt string, user str
 		"User":       user,
 	}
 
-	_, err := r.Table("yuque").Insert(data).RunWrite(session)
+	_, err := r.DB("yuque").Table("yuque").Insert(data).RunWrite(session)
 
 	return err
 }

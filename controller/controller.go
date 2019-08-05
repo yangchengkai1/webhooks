@@ -95,6 +95,7 @@ func (s Session) yuqueStore(c *gin.Context) {
 func (s Session) selectHandler(c *gin.Context) {
 	var (
 		term struct {
+			DBName    string `json:"db_name"    binding:"required"`
 			TableName string `json:"table_name" binding:"required"`
 			Field     string `json:"field"      binding:"required"`
 			Value     string `json:"value"      binding:"required"`
@@ -117,7 +118,7 @@ func (s Session) selectHandler(c *gin.Context) {
 		session = s.gs
 	}
 
-	all, err := model.SelectRecord(session, term.TableName, term.Field, term.Value)
+	all, err := model.SelectRecord(session, term.DBName, term.TableName, term.Field, term.Value)
 	if err != nil {
 		c.Error(err)
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"status": http.StatusMethodNotAllowed})

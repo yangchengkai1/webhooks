@@ -90,10 +90,10 @@ func CheckTable(session *r.Session, dbname, tablename string) error {
 }
 
 // SelectRecord -
-func SelectRecord(session *r.Session, tablename, field, value string) (interface{}, error) {
+func SelectRecord(session *r.Session, DBName, TableName, field, value string) (interface{}, error) {
 	var all []interface{}
 
-	acursor, err := r.Table(tablename).Filter(r.Row.Field(field).Eq(value)).Run(session)
+	acursor, err := r.DB(DBName).Table(TableName).Filter(r.Row.Field(field).Eq(value)).Run(session)
 
 	acursor.All(&all)
 	acursor.Close()
@@ -102,21 +102,21 @@ func SelectRecord(session *r.Session, tablename, field, value string) (interface
 }
 
 // DelateRecord -
-func DelateRecord(session *r.Session, dbname, tablename, field, value string) error {
+func DelateRecord(session *r.Session, DBName, TableName, field, value string) error {
 	var delate = map[string]interface{}{
 		field: value,
 	}
-	_, err := r.DB(dbname).Table(tablename).Filter(delate).Delete().Run(session)
+	_, err := r.DB(DBName).Table(TableName).Filter(delate).Delete().Run(session)
 
 	return err
 }
 
 // UpdateRecord -
-func UpdateRecord(session *r.Session, tablename, field, value string) (r.WriteResponse, error) {
+func UpdateRecord(session *r.Session, DBName, TableName, field, value string) (r.WriteResponse, error) {
 	var update = map[string]interface{}{
 		field: value,
 	}
 
-	return r.Table(tablename).Update(update).RunWrite(session)
+	return r.DB(DBName).Table(TableName).Update(update).RunWrite(session)
 
 }
