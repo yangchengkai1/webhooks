@@ -44,7 +44,6 @@ func RegisterRouter(router gin.IRouter) {
 	}
 
 	ss = &Session{ys: ys, gs: gs}
-	log.Printf("%p,%p,%p,%p\n", session, ys, gs, ss)
 
 	router.POST("/github/webhook", ss.githubStore)
 	router.POST("/yuque/webhook", ss.yuqueStore)
@@ -66,10 +65,9 @@ func (s Session) githubStore(c *gin.Context) {
 		push := payload.(github.PushPayload)
 		err = model.InsertGitRecord(push, s.gs)
 		if err != nil {
-			log.Println("0")
 			c.Error(err)
 			c.JSON(http.StatusMethodNotAllowed, gin.H{"status": http.StatusMethodNotAllowed})
-
+			return
 		}
 	}
 

@@ -15,7 +15,7 @@ func InsertGitRecord(push github.PushPayload, session *r.Session) error {
 		"UpdatedAt":       push.Repository.UpdatedAt,
 	}
 
-	_, err := r.DB("github").Table("github1").Insert(data).RunWrite(session)
+	_, err := r.DB("github").Table("github").Insert(data).RunWrite(session)
 
 	return err
 }
