@@ -6,29 +6,62 @@ import (
 	r "github.com/dancannon/gorethink"
 )
 
-var errTable = errors.New("table already exits")
+var (
+	errTableCreate = errors.New("Table already exits")
+	errDBCreate    = errors.New("DB already exits")
+)
 
-// CreateTable -
-func CreateTable(DBName, TableName string) (*r.Session, error) {
-	Session, err := r.Connect(r.ConnectOpts{
-		Address:  "localhost",
-		Database: DBName,
-	})
-	if err != nil {
-		return nil, err
-	}
-
-	err = CheckTable(Session, DBName, TableName)
-	if err == errTable {
+// Create -
+func Create(DBName, TableName string, Session *r.Session) (*r.Session, error) {
+	err := CheckDB(Session, DBName)
+	if err == errDBCreate {
 		return Session, nil
 	}
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = r.DB(DBName).TableCreate(TableName).RunWrite(Session)
+	_, err = r.DBCreate(DBName).Run(Session)
+	if err != nil {
+		return nil, err
+	}
+
+	err = CheckTable(Session, DBName, TableName)
+	if err == errTableCreate {
+		return Session, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+
+	_, err = r.DB(DBName).TableCreate(TableName).Run(Session)
 
 	return Session, err
+}
+
+//CheckDB -
+func CheckDB(session *r.Session, dbname string) error {
+	var list []interface{}
+	var check bool
+
+	cursor, err := r.DBList().Run(session)
+	if err != nil {
+		return err
+	}
+
+	cursor.All(&list)
+	cursor.Close()
+
+	for _, db := range list {
+		if !check {
+			tn := db.(string)
+			if tn == dbname {
+				return errDBCreate
+			}
+		}
+	}
+
+	return nil
 }
 
 //CheckTable -
@@ -48,13 +81,12 @@ func CheckTable(session *r.Session, dbname, tablename string) error {
 		if !check {
 			tn := table.(string)
 			if tn == tablename {
-				return errTable
+				return errTableCreate
 			}
 		}
 	}
 
 	return nil
-
 }
 
 // SelectRecord -
@@ -80,12 +112,11 @@ func DelateRecord(session *r.Session, dbname, tablename, field, value string) er
 }
 
 // UpdateRecord -
-func UpdateRecord(session *r.Session, tablename, field, value string) error {
+func UpdateRecord(session *r.Session, tablename, field, value string) (r.WriteResponse, error) {
 	var update = map[string]interface{}{
 		field: value,
 	}
 
-	_, err := r.Table(tablename).Update(update).Run(session)
+	return r.Table(tablename).Update(update).RunWrite(session)
 
-	return err
 }

@@ -26,12 +26,19 @@ type Session struct {
 func RegisterRouter(router gin.IRouter) {
 	var ss *Session
 
-	ys, err := model.CreateTable("yuque", "yuque")
+	session, err := r.Connect(r.ConnectOpts{
+		Address: "localhost",
+	})
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	gs, err := model.CreateTable("github", "github")
+	ys, err := model.Create("yuque", "yuque", session)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	gs, err := model.Create("github", "github", session)
 	if err != nil {
 		log.Fatal(err)
 	}
