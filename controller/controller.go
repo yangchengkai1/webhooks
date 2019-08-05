@@ -65,6 +65,7 @@ func (s Session) githubStore(c *gin.Context) {
 		push := payload.(github.PushPayload)
 		err = model.InsertGitRecord(push, s.gs)
 		if err != nil {
+			log.Println("0")
 			c.Error(err)
 			c.JSON(http.StatusMethodNotAllowed, gin.H{"status": http.StatusMethodNotAllowed})
 			return
