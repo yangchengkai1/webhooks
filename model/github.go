@@ -1,8 +1,6 @@
 package model
 
 import (
-	"log"
-
 	r "github.com/dancannon/gorethink"
 	"gopkg.in/go-playground/webhooks.v5/github"
 )
@@ -17,7 +15,7 @@ func InsertGitRecord(push github.PushPayload, session *r.Session) error {
 		"UpdatedAt":       push.Repository.UpdatedAt,
 	}
 
-	r, err := r.DB("github").Table("github").Insert(data).Run(session)
-	log.Println(r, "---")
+	_, err := r.DB("github").Table("github1").Insert(data).RunWrite(session)
+
 	return err
 }
