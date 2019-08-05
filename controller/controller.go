@@ -44,6 +44,7 @@ func RegisterRouter(router gin.IRouter) {
 	}
 
 	ss = &Session{ys: ys, gs: gs}
+	log.Printf("%p,%p,%p,%p\n", session, ys, gs, ss)
 
 	router.POST("/github/webhook", ss.githubStore)
 	router.POST("/yuque/webhook", ss.yuqueStore)
