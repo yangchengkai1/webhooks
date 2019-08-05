@@ -8,12 +8,11 @@ import (
 
 	r "github.com/dancannon/gorethink"
 	"github.com/gin-gonic/gin"
-	"github.com/yangchengkai1/webhooks/model"
-	yuque "github.com/yangchengkai1/webhooks/model"
+	model "github.com/yangchengkai1/webhooks/model/rethinkdb"
 )
 
 var yqhook struct {
-	Data yuque.DocDetailSerializer `json:"data"`
+	Data model.DocDetailSerializer `json:"data"`
 }
 
 // Session -
