@@ -69,7 +69,7 @@ func (s Session) githubStore(c *gin.Context) {
 			log.Println("0")
 			c.Error(err)
 			c.JSON(http.StatusMethodNotAllowed, gin.H{"status": http.StatusMethodNotAllowed})
-			return
+
 		}
 	}
 
