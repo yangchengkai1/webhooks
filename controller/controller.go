@@ -47,6 +47,9 @@ func RegisterRouter(router gin.IRouter) {
 	router.POST("/github/webhook", ss.githubStore)
 	router.POST("/yuque/webhook", ss.yuqueStore)
 	router.POST("/select", ss.selectHandler)
+	router.POST("/selectall", ss.selectAllHandler)
+	router.POST("/delete", ss.deleteHandler)
+	router.POST("/update", ss.updateHandler)
 }
 
 func (s Session) githubStore(c *gin.Context) {
@@ -125,4 +128,110 @@ func (s Session) selectHandler(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"all": all})
+}
+
+func (s Session) selectAllHandler(c *gin.Context) {
+	var (
+		term struct {
+			DBName    string `json:"db_name"    binding:"required"`
+			TableName string `json:"table_name" binding:"required"`
+		}
+
+		session *r.Session
+	)
+
+	err := c.ShouldBind(&term)
+	if err != nil {
+		c.Error(err)
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest})
+		return
+	}
+
+	switch term.TableName {
+	case "yuque":
+		session = s.ys
+	case "github":
+		session = s.gs
+	}
+	log.Println(term.TableName)
+	all, err := model.AllRecord(session, term.DBName, term.TableName)
+	if err != nil {
+		c.Error(err)
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"status": http.StatusMethodNotAllowed})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"all": all})
+}
+
+func (s Session) deleteHandler(c *gin.Context) {
+	var (
+		term struct {
+			DBName    string `json:"db_name"    binding:"required"`
+			TableName string `json:"table_name" binding:"required"`
+			Field     string `json:"field"      binding:"required"`
+			Value     string `json:"value"      binding:"required"`
+		}
+
+		session *r.Session
+	)
+
+	err := c.ShouldBind(&term)
+	if err != nil {
+		c.Error(err)
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest})
+		return
+	}
+
+	switch term.TableName {
+	case "yuque":
+		session = s.ys
+	case "github":
+		session = s.gs
+	}
+
+	err = model.DelateRecord(session, term.DBName, term.TableName, term.Field, term.Value)
+	if err != nil {
+		c.Error(err)
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"status": http.StatusMethodNotAllowed})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK})
+}
+
+func (s Session) updateHandler(c *gin.Context) {
+	var (
+		term struct {
+			DBName    string `json:"db_name"    binding:"required"`
+			TableName string `json:"table_name" binding:"required"`
+			Field     string `json:"field"      binding:"required"`
+			Value     string `json:"value"      binding:"required"`
+		}
+
+		session *r.Session
+	)
+
+	err := c.ShouldBind(&term)
+	if err != nil {
+		c.Error(err)
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest})
+		return
+	}
+
+	switch term.TableName {
+	case "yuque":
+		session = s.ys
+	case "github":
+		session = s.gs
+	}
+
+	resp, err := model.UpdateRecord(session, term.DBName, term.TableName, term.Field, term.Value)
+	if err != nil {
+		c.Error(err)
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"status": http.StatusMethodNotAllowed})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": resp})
 }

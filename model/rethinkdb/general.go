@@ -94,11 +94,28 @@ func SelectRecord(session *r.Session, DBName, TableName, field, value string) (i
 	var all []interface{}
 
 	acursor, err := r.DB(DBName).Table(TableName).Filter(r.Row.Field(field).Eq(value)).Run(session)
+	if err != nil {
+		return nil, err
+	}
 
 	acursor.All(&all)
 	acursor.Close()
 
-	return all, err
+	return all, nil
+}
+
+// AllRecord -
+func AllRecord(session *r.Session, DBName, TableName string) (interface{}, error) {
+	var all []interface{}
+
+	acursor, err := r.DB(DBName).Table(TableName).Run(session)
+	if err != nil {
+		return nil, err
+	}
+
+	acursor.All(&all)
+
+	return all, nil
 }
 
 // DelateRecord -
