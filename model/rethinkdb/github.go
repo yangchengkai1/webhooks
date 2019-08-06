@@ -11,7 +11,7 @@ func InsertPushRecord(push github.PushPayload, session *r.Session) error {
 		"repo_owner": push.Repository.Owner.Login,
 		"repo_name":  push.Repository.FullName,
 		"message":    push.HeadCommit.Message,
-		"URL":        push.HeadCommit.URL,
+		"url":        push.HeadCommit.URL,
 		"updated_at": push.Repository.UpdatedAt,
 	}
 
@@ -28,6 +28,7 @@ func InsertReleaseRecord(release github.ReleasePayload, session *r.Session) erro
 		"published_at": release.Release.PublishedAt,
 		"repo_owner":   release.Repository.Owner.Login,
 		"repo_name":    release.Repository.FullName,
+		"url":          release.Repository.URL,
 		"sender":       release.Sender.Login,
 	}
 
@@ -42,6 +43,7 @@ func InsertRepoRecord(repo github.RepositoryPayload, session *r.Session) error {
 		"action":     repo.Action,
 		"repo_owner": repo.Repository.Owner.Login,
 		"repo_name":  repo.Repository.FullName,
+		"url":        repo.Repository.URL,
 		"created_at": repo.Repository.CreatedAt,
 		"updated_at": repo.Repository.UpdatedAt,
 		"pushed_at":  repo.Repository.PushedAt,
