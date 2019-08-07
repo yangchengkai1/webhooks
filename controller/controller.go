@@ -143,7 +143,7 @@ func (s Session) selectHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"all": all})
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "all": all})
 }
 
 func (s Session) selectAllHandler(c *gin.Context) {
@@ -169,7 +169,7 @@ func (s Session) selectAllHandler(c *gin.Context) {
 	case "github":
 		session = s.gs
 	}
-	log.Println(term.TableName)
+
 	all, err := model.AllRecord(session, term.DBName, term.TableName)
 	if err != nil {
 		c.Error(err)
@@ -177,7 +177,7 @@ func (s Session) selectAllHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"all": all})
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "all": all})
 }
 
 func (s Session) deleteHandler(c *gin.Context) {
@@ -249,5 +249,5 @@ func (s Session) updateHandler(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"status": resp})
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "resp": resp})
 }
