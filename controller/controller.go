@@ -256,8 +256,8 @@ func (s Session) updateHandler(c *gin.Context) {
 func (s Session) filterHandler(c *gin.Context) {
 	var (
 		term struct {
-			DBName    string   `json:"db_name"    binding:"required"`
-			TableName string   `json:"table_name" binding:"required"`
+			DBName    string   `json:"db_name"     binding:"required"`
+			TableName string   `json:"table_name"  binding:"required"`
 			Filter    []string `json:"filter"      binding:"required"`
 		}
 
@@ -278,7 +278,7 @@ func (s Session) filterHandler(c *gin.Context) {
 		session = s.gs
 	}
 
-	resp, err := model.Filter(session, term.DBName, term.TableName, &term.Filter)
+	resp, err := model.Filter(session, term.DBName, term.TableName, term.Filter)
 	if err != nil {
 		c.Error(err)
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"status": http.StatusMethodNotAllowed})

@@ -114,6 +114,7 @@ func AllRecord(session *r.Session, DBName, TableName string) (interface{}, error
 	}
 
 	acursor.All(&all)
+	acursor.Close()
 
 	return all, nil
 }
@@ -139,6 +140,16 @@ func UpdateRecord(session *r.Session, DBName, TableName, field, value string) (r
 }
 
 // Filter -
-func Filter(session *r.Session, DBName, TableName string, filter *[]string) (interface{}, error) {
-	return r.DB(DBName).Table(TableName).WithFields(filter).Run(session)
+func Filter(session *r.Session, DBName, TableName string, filter []string) (interface{}, error) {
+	var all []interface{}
+
+	acursor, err := r.DB(DBName).Table(TableName).WithFields(filter).Run(session)
+	if err != nil {
+		return nil, err
+	}
+
+	acursor.All(&all)
+	acursor.Close()
+
+	return all, nil
 }
