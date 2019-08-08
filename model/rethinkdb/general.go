@@ -137,3 +137,8 @@ func UpdateRecord(session *r.Session, DBName, TableName, field, value string) (r
 	return r.DB(DBName).Table(TableName).Update(update).RunWrite(session)
 
 }
+
+// Filter -
+func Filter(session *r.Session, DBName, TableName string, filter *[]string) (interface{}, error) {
+	return r.DB(DBName).Table(TableName).WithFields(filter).Run(session)
+}

@@ -50,6 +50,7 @@ func RegisterRouter(router gin.IRouter) {
 	router.POST("/selectall", ss.selectAllHandler)
 	router.POST("/delete", ss.deleteHandler)
 	router.POST("/update", ss.updateHandler)
+	router.POST("/filter", ss.filterHandler)
 }
 
 func (s Session) githubStore(c *gin.Context) {
@@ -243,6 +244,41 @@ func (s Session) updateHandler(c *gin.Context) {
 	}
 
 	resp, err := model.UpdateRecord(session, term.DBName, term.TableName, term.Field, term.Value)
+	if err != nil {
+		c.Error(err)
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"status": http.StatusMethodNotAllowed})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "resp": resp})
+}
+
+func (s Session) filterHandler(c *gin.Context) {
+	var (
+		term struct {
+			DBName    string   `json:"db_name"    binding:"required"`
+			TableName string   `json:"table_name" binding:"required"`
+			Filter    []string `json:"filter"      binding:"required"`
+		}
+
+		session *r.Session
+	)
+
+	err := c.ShouldBind(&term)
+	if err != nil {
+		c.Error(err)
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest})
+		return
+	}
+
+	switch term.TableName {
+	case "yuque":
+		session = s.ys
+	case "github":
+		session = s.gs
+	}
+
+	resp, err := model.Filter(session, term.DBName, term.TableName, &term.Filter)
 	if err != nil {
 		c.Error(err)
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"status": http.StatusMethodNotAllowed})
