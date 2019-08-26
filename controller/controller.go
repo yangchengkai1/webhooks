@@ -11,10 +11,6 @@ import (
 	model "github.com/yangchengkai1/webhooks/model/rethinkdb"
 )
 
-var yqhook struct {
-	Data model.DocDetailSerializer `json:"data"`
-}
-
 // Session -
 type Session struct {
 	ys *r.Session
@@ -95,6 +91,8 @@ func (s Session) githubStore(c *gin.Context) {
 }
 
 func (s Session) yuqueStore(c *gin.Context) {
+	var yqhook model.DocDetailSerializer
+
 	err := c.ShouldBind(&yqhook)
 	if err != nil {
 		c.Error(err)
