@@ -97,6 +97,21 @@ func SelectRecord(session *r.Session, DBName, TableName, field, value string) (i
 	if err != nil {
 		return nil, err
 	}
+	r.DB(DBName).Table(TableName).Pluck()
+	acursor.All(&all)
+	acursor.Close()
+
+	return all, nil
+}
+
+// SelectItems -
+func SelectItems(session *r.Session, DBName, TableName string, items []string) (interface{}, error) {
+	var all []interface{}
+
+	acursor, err := r.DB(DBName).Table(TableName).Pluck(items).Run(session)
+	if err != nil {
+		return nil, err
+	}
 
 	acursor.All(&all)
 	acursor.Close()

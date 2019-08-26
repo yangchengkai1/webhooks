@@ -46,8 +46,9 @@ func RegisterRouter(router gin.IRouter) {
 
 	router.POST("/github/webhook", ss.githubStore)
 	router.POST("/yuque/webhook", ss.yuqueStore)
-	router.POST("/select", ss.selectHandler)
-	router.POST("/selectall", ss.selectAllHandler)
+	router.GET("/select/value", ss.selectHandler)
+	router.POST("/select/field", ss.selectItems)
+	router.GET("/select/all", ss.selectAllHandler)
 	router.POST("/delete", ss.deleteHandler)
 	router.POST("/update", ss.updateHandler)
 	router.POST("/filter", ss.filterHandler)
@@ -138,6 +139,41 @@ func (s Session) selectHandler(c *gin.Context) {
 	}
 
 	all, err := model.SelectRecord(session, term.DBName, term.TableName, term.Field, term.Value)
+	if err != nil {
+		c.Error(err)
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"status": http.StatusMethodNotAllowed})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"status": http.StatusOK, "all": all})
+}
+
+func (s Session) selectItems(c *gin.Context) {
+	var (
+		term struct {
+			DBName    string   `json:"db_name"    binding:"required"`
+			TableName string   `json:"table_name" binding:"required"`
+			Field     []string `json:"field"      binding:"required"`
+		}
+
+		session *r.Session
+	)
+
+	err := c.ShouldBind(&term)
+	if err != nil {
+		c.Error(err)
+		c.JSON(http.StatusBadRequest, gin.H{"status": http.StatusBadRequest})
+		return
+	}
+
+	switch term.TableName {
+	case "yuque":
+		session = s.ys
+	case "github":
+		session = s.gs
+	}
+
+	all, err := model.SelectItems(session, term.DBName, term.TableName, term.Field)
 	if err != nil {
 		c.Error(err)
 		c.JSON(http.StatusMethodNotAllowed, gin.H{"status": http.StatusMethodNotAllowed})
