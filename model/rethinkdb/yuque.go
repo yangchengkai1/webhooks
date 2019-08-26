@@ -9,10 +9,10 @@ import (
 // InsertYuQueRecord -
 func InsertYuQueRecord(body string, actionType string, updateAt time.Time, user string, session *r.Session) error {
 	var data = map[string]interface{}{
-		"ActionType": actionType,
-		"Body":       body,
-		"UpdateAt":   updateAt,
-		"User":       user,
+		"action_type": actionType,
+		"body":        body,
+		"update_at":   updateAt,
+		"user":        user,
 	}
 
 	_, err := r.DB("yuque").Table("yuque").Insert(data).RunWrite(session)
