@@ -69,6 +69,7 @@ func (s Session) githubStore(c *gin.Context) {
 			c.JSON(http.StatusMethodNotAllowed, gin.H{"status": http.StatusMethodNotAllowed})
 			return
 		}
+
 	case github.ReleasePayload:
 		release := payload.(github.ReleasePayload)
 		err = model.InsertReleaseRecord(release, s.gs)
@@ -77,6 +78,7 @@ func (s Session) githubStore(c *gin.Context) {
 			c.JSON(http.StatusMethodNotAllowed, gin.H{"status": http.StatusMethodNotAllowed})
 			return
 		}
+
 	case github.RepositoryPayload:
 		repo := payload.(github.RepositoryPayload)
 		err = model.InsertRepoRecord(repo, s.gs)
