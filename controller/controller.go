@@ -42,9 +42,11 @@ func RegisterRouter(router gin.IRouter) {
 
 	router.POST("/github/webhook", ss.githubStore)
 	router.POST("/yuque/webhook", ss.yuqueStore)
+
 	router.GET("/select/value", ss.selectHandler)
 	router.POST("/select/field", ss.selectItems)
 	router.GET("/select/all", ss.selectAllHandler)
+
 	router.POST("/delete", ss.deleteHandler)
 	router.POST("/update", ss.updateHandler)
 	router.POST("/filter", ss.filterHandler)
